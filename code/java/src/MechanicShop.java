@@ -305,7 +305,32 @@ public class MechanicShop{
 	}//end readChoice
 	
 	public static void AddCustomer(MechanicShop esql){//1
-		
+		// id INTEGER NOT NULL,
+		// fname CHAR(32) NOT NULL,
+		// lname CHAR(32) NOT NULL,
+		// phone CHAR(13) NOT NULL,
+		// address CHAR(256) NOT NULL,
+		// PRIMARY KEY (id)
+		try{
+			String query = "INSERT INTO Customer (id, fname, lname, phone, address) VALUES (";
+			System.out.print("\tEnter First Name: ");
+			String input = in.readLine();
+			query += "'" + input + "', ";
+			System.out.print("\tEnter Last Name: ");
+			input = in.readLine();
+			query += "'" + input + "', ";
+			System.out.print("\tEnter Phone Number: ");
+			input = in.readLine();
+			query += "'" + input + "', ";
+			System.out.print("\tEnter Address: ");
+			input = in.readLine();
+			query += "'" + input + "');";
+			
+			int rowCount = esql.executeQuery(query);
+			System.out.println ("total row(s): " + rowCount);
+      	}catch(Exception e){
+			System.err.println (e.getMessage());
+		}
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
@@ -313,15 +338,71 @@ public class MechanicShop{
 	}
 	
 	public static void AddCar(MechanicShop esql){//3
-		
+		// vin VARCHAR(16) NOT NULL,
+		// make VARCHAR(32) NOT NULL,
+		// model VARCHAR(32) NOT NULL,
+		// year _YEAR NOT NULL,
+		// PRIMARY KEY (vin)
+		try{
+			String query = "INSERT INTO Car (vin, make, model, year) VALUES (";
+			System.out.print("\tEnter Make: ");
+			String input = in.readLine();
+			query += "'" + input + "', ";
+			System.out.print("\tEnter Model: ");
+			input = in.readLine();
+			query += "'" + input + "', ";
+			System.out.print("\tEnter Year: ");
+			input = in.readLine();
+			query += "'" + input + "',);";
+			
+			int rowCount = esql.executeQuery(query);
+			System.out.println ("total row(s): " + rowCount);
+      	}catch(Exception e){
+			System.err.println (e.getMessage());
+      	}
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
-		
+
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
+		// This function will allow you to complete an existing service request. Given a service
+		// request number and an employee id, the client application should verify the information
+		// provided and attempt to create a closing request record. You should make sure to check
+		// for the validity of the provided inputs (i.e. does the mechanic exist, does the request exist,
+		// valid closing date after request date, etc.)
+
+		// CREATE TABLE Closed_Request
+		// (
+		// 	wid INTEGER NOT NULL,
+		// 	rid INTEGER NOT NULL,
+		// 	mid INTEGER NOT NULL,
+		// 	date DATE NOT NULL,
+		// 	comment TEXT,
+		// 	bill _PINTEGER NOT NULL,
+		// 	PRIMARY KEY (wid),
+		// 	FOREIGN KEY (rid) REFERENCES Service_Request(rid),
+		// 	FOREIGN KEY (mid) REFERENCES Mechanic(id)
+		// );
 		
+		// try{
+		// 	String query = "INSERT INTO Closed_Request (wid, rid, mid, date, comment, bill) VALUES (";
+		// 	System.out.print("\tEnter Make: ");
+		// 	String input = in.readLine();
+		// 	query += "'" + input + "', ";
+		// 	System.out.print("\tEnter Model: ");
+		// 	input = in.readLine();
+		// 	query += "'" + input + "', ";
+		// 	System.out.print("\tEnter Year: ");
+		// 	input = in.readLine();
+		// 	query += "'" + input + "',);";
+			
+		// 	int rowCount = esql.executeQuery(query);
+		// 	System.out.println ("total row(s): " + rowCount);
+      	// }catch(Exception e){
+		// 	System.err.println (e.getMessage());
+      	// }
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
