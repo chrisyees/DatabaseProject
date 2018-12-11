@@ -312,7 +312,7 @@ public class MechanicShop{
 		// address CHAR(256) NOT NULL,
 		// PRIMARY KEY (id)
 		try{
-			String query = "INSERT INTO Customer (id, fname, lname, phone, address) VALUES (";
+			String query = "INSERT INTO Customer (fname, lname, phone, address) VALUES (";
 			System.out.print("\tEnter First Name: ");
 			String input = in.readLine();
 			query += "'" + input + "', ";
@@ -344,7 +344,7 @@ public class MechanicShop{
 		// year _YEAR NOT NULL,
 		// PRIMARY KEY (vin)
 		try{
-			String query = "INSERT INTO Car (vin, make, model, year) VALUES (";
+			String query = "INSERT INTO Car (make, model, year) VALUES (";
 			System.out.print("\tEnter Make: ");
 			String input = in.readLine();
 			query += "'" + input + "', ";
@@ -354,7 +354,7 @@ public class MechanicShop{
 			System.out.print("\tEnter Year: ");
 			input = in.readLine();
 			query += "'" + input + "',);";
-			
+
 			int rowCount = esql.executeQuery(query);
 			System.out.println ("total row(s): " + rowCount);
       	}catch(Exception e){
@@ -371,7 +371,7 @@ public class MechanicShop{
 		// request number and an employee id, the client application should verify the information
 		// provided and attempt to create a closing request record. You should make sure to check
 		// for the validity of the provided inputs (i.e. does the mechanic exist, does the request exist,
-		// valid closing date after request date, etc.)
+		// valid closing date after request date, etc.)  
 
 		// CREATE TABLE Closed_Request
 		// (
@@ -385,32 +385,64 @@ public class MechanicShop{
 		// 	FOREIGN KEY (rid) REFERENCES Service_Request(rid),
 		// 	FOREIGN KEY (mid) REFERENCES Mechanic(id)
 		// );
-		
-		// try{
-		// 	String query = "INSERT INTO Closed_Request (wid, rid, mid, date, comment, bill) VALUES (";
-		// 	System.out.print("\tEnter Make: ");
-		// 	String input = in.readLine();
-		// 	query += "'" + input + "', ";
-		// 	System.out.print("\tEnter Model: ");
-		// 	input = in.readLine();
-		// 	query += "'" + input + "', ";
-		// 	System.out.print("\tEnter Year: ");
-		// 	input = in.readLine();
-		// 	query += "'" + input + "',);";
+		try{
+			String query = "INSERT INTO Closed_Request (rid, mid, date, comment, bill) VALUES (";
+
+			System.out.print("\tEnter Service Request ID: ");
+			String input = in.readLine();
 			
-		// 	int rowCount = esql.executeQuery(query);
-		// 	System.out.println ("total row(s): " + rowCount);
-      	// }catch(Exception e){
-		// 	System.err.println (e.getMessage());
-      	// }
+			// Get rid input and check if valid
+			while (!isInteger(input) && Integer.parseInt(input) > 0 && esql.executeQuery("SELECT rid FROM Service_Request WHERE rid=" + input + ";") < 1) {
+				System.out.print("\tInvalid Service Request ID.");
+				System.out.print("\tEnter Service Request ID: ");
+				input = in.readLine();
+			}
+
+			// Get service request 
+			query += "'" + input + "', ";
+
+			System.out.print("\tEnter Mechanic ID: ");
+			input = in.readLine();
+			while (!isInteger(input) && Integer.parseInt(input) > 0) {
+				System.out.print("\tInvalid Mechanic ID.");
+				System.out.print("\tEnter Mechanic ID: ");
+				input = in.readLine();
+			}
+			query += "'" + input + "', ";
+
+			System.out.print("\tEnter Comment: ");
+			input = in.readLine();
+			query += "'" + input + "',);";
+			
+			System.out.print("\tEnter Bill: ");
+			input = in.readLine();
+			while (!isInteger(input) && Integer.parseInt(input) > 0) {
+				System.out.print("\tInvalid Bill.");
+				System.out.print("\tEnter Bill: ");
+				input = in.readLine();
+			}
+			query += "'" + input + "',);";
+			
+			int rowCount = esql.executeQuery(query);
+			System.out.println ("total row(s): " + rowCount);
+
+		}catch(Exception e){
+			System.err.println (e.getMessage());
+		}
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
-		
+
 	}
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
-		
+		try{
+			String query = "SELECT fname, lname FROM Customer WHERE customer_id IN (SELECT customer_id FROM Owns GROUP BY customer_id HAVING COUNT(customer_id) > 20)";
+			int rowCount = esql.executeQuery(query);
+			System.out.println ("total row(s): " + rowCount);
+		}catch(Exception e){
+			System.err.println (e.getMessage());
+		}
 	}
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
@@ -419,7 +451,14 @@ public class MechanicShop{
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
 		//
-		
+		// try{
+		// 	String query = "SELECT C.make, C.model, C.reqs FROM Car C ";
+		// 	SELECT COUNT(S.car_vin) AS sreqs FROM Service_Request S WHERE C.car_vin=S.car_vin
+		// 	int rowCount = esql.executeQuery(query);
+		// 	System.out.println ("total row(s): " + rowCount);
+		// }catch(Exception e){
+		// 	System.err.println (e.getMessage());
+		// }
 	}
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//9
@@ -427,4 +466,14 @@ public class MechanicShop{
 		
 	}
 	
+	public static boolean isInteger(String s) {
+		boolean isValidInteger = false;
+		try{
+			Integer.parseInt(s);
+			isValidInteger = true;
+		}
+		catch (NumberFormatException ex){
+		}
+		return isValidInteger;
+	}
 }
