@@ -313,23 +313,46 @@ public class MechanicShop{
 		// PRIMARY KEY (id)
 		try{
 			String query = "INSERT INTO Customer (fname, lname, phone, address) VALUES (";
+			
 			System.out.print("\tEnter First Name: ");
 			String input = in.readLine();
+			while (input.length() == 0 || input.length() > 32 ) {
+				System.out.print("\tName Invalid.\n");
+				System.out.print("\tEnter First Name: ");
+				input = in.readLine();
+			}
 			query += "'" + input + "', ";
+			
 			System.out.print("\tEnter Last Name: ");
 			input = in.readLine();
+			while (input.length() == 0 || input.length() > 32 ) {
+				System.out.print("\tName Invalid.\n");
+				System.out.print("\tEnter Last Name: ");
+				input = in.readLine();
+			}
 			query += "'" + input + "', ";
+			
 			System.out.print("\tEnter Phone Number (###)###-####: ");
 			input = in.readLine();
+			while (input.length() == 0 || input.length() > 13 || !input.matches("\\(\\d{3})\\d{3}-\\d{4}")) {
+				System.out.print("\tInvalid Phone Number.\n");
+				System.out.print("\tEnter Phone Number: ");
+				input = in.readLine();
+			}
 			query += "'" + input + "', ";
+			
 			System.out.print("\tEnter Address: ");
 			input = in.readLine();
+			while (input.length() == 0 || input.length() > 256) {
+				System.out.print("\tInvalid Address.\n");
+				System.out.print("\tEnter Address: ");
+				input = in.readLine();
+			}
 			query += "'" + input + "');";
 			
-			//int rowCount = esql.executeQuery(query);
-			//System.out.println ("total row(s): " + rowCount);
-			esql.executeQueryAndPrintResult("SELECT * FROM Customer WHERE id>495");
-			
+			esql.executeUpdate(query);
+			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Customer WHERE id>499");
+			System.out.println ("total row(s): " + rowCount);
       	}catch(Exception e){
 			System.err.println (e.getMessage());
 		}
@@ -349,29 +372,44 @@ public class MechanicShop{
 			String query = "INSERT INTO Car (vin, make, model, year) VALUES (";
 			
 			System.out.print("\tEnter VIN: ");
-			String input = in.readLine();
+			String vin = in.readLine();
 			while (input.length() != 16 || esql.executeQuery("SELECT vin FROM Car WHERE vin=" + input + ";") < 1) {
-				System.out.print("\tInvalid VIN.");
+				System.out.print("\tInvalid VIN.\n");
 				System.out.print("\tEnter VIN: ");
 				input = in.readLine();
 			}
 			query += "'" + input + "', ";
 			
 			System.out.print("\tEnter Make: ");
-			input = in.readLine();
+			String input = in.readLine();
+			while (input.length() == 0 || input.length() > 32 ) {
+				System.out.print("\tInvalid Make.\n");
+				System.out.print("\tEnter Make: ");
+				input = in.readLine();
+			}
 			query += "'" + input + "', ";
+
 			System.out.print("\tEnter Model: ");
 			input = in.readLine();
+			while (input.length() == 0 || input.length() > 32 ) {
+				System.out.print("\tInvalid Model.\n");
+				System.out.print("\tEnter Model: ");
+				input = in.readLine();
+			}
 			query += "'" + input + "', ";
+
 			System.out.print("\tEnter Year: ");
 			input = in.readLine();
+			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0) {
+				System.out.print("\tInvalid Year.\n");
+				System.out.print("\tEnter Year: ");
+				input = in.readLine();
+			}
 			query += "'" + input + "');";
 
-			//int rowCount = esql.executeQuery(query);
-			//System.out.println ("total row(s): " + rowCount);
-			
-			esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin='12hghgjfkdlskasj'");
-
+			esql.executeUpdate(query);
+			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin='" + vin + "'");
+			System.out.println ("total row(s): " + rowCount);
       	}catch(Exception e){
 			System.err.println (e.getMessage());
       	}
@@ -407,23 +445,25 @@ public class MechanicShop{
 			String input = in.readLine();
 			
 			// Get rid input and check if valid
-			while (!isInteger(input) || Integer.parseInt(input) < 0 || esql.executeQuery("SELECT rid FROM Service_Request WHERE rid=" + input + ";") < 1) {
-				System.out.print("\tInvalid Service Request ID.");
+			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0 || esql.executeQuery("SELECT rid FROM Service_Request WHERE rid=" + input + ";") < 1) {
+				System.out.print("\tInvalid Service Request ID.\n");
 				System.out.print("\tEnter Service Request ID: ");
 				input = in.readLine();
 			}
-
-			// Get service request 
 			query += "'" + input + "', ";
 
 			System.out.print("\tEnter Mechanic ID: ");
 			input = in.readLine();
-			while (!isInteger(input) || Integer.parseInt(input) < 0) {
-				System.out.print("\tInvalid Mechanic ID.");
+			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0) {
+				System.out.print("\tInvalid Mechanic ID.\n");
 				System.out.print("\tEnter Mechanic ID: ");
 				input = in.readLine();
 			}
 			query += "'" + input + "', ";
+
+			System.out.print("\tEnter Date: ");
+			input = in.readLine();
+			query += "'" + input + "',);";
 
 			System.out.print("\tEnter Comment: ");
 			input = in.readLine();
@@ -431,14 +471,15 @@ public class MechanicShop{
 			
 			System.out.print("\tEnter Bill: ");
 			input = in.readLine();
-			while (!isInteger(input) || Integer.parseInt(input) < 0) {
-				System.out.print("\tInvalid Bill.");
+			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0) {
+				System.out.print("\tInvalid Bill.\n");
 				System.out.print("\tEnter Bill: ");
 				input = in.readLine();
 			}
 			query += "'" + input + "');";
 			
-			int rowCount = esql.executeQuery(query);
+			esql.executeUpdate(query);
+			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Closed_Request WHERE wid>499");
 			System.out.println ("total row(s): " + rowCount);
 
 		}catch(Exception e){
@@ -466,23 +507,21 @@ public class MechanicShop{
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
 		try{
-			//String query = "SELECT C.make, C.model, COUNT(S.rid) AS numS FROM Car C, Service_Request S WHERE C.vin = S.car_vin GROUP BY C.vin ORDER BY numS DESC LIMIT ";
-			String query = "SELECT make, model, R.creq FROM Car AS C, (SELECT car_vin, COUNT(rid) AS creq FROM Service_Request GROUP BY car_vin ) AS R WHERE R.car_vin = C.vin ORDER BY R.creq DESC LIMIT 10;";
+			String query = "SELECT C.make, C.model, COUNT(S.rid) AS numS FROM Car C, Service_Request S WHERE C.vin = S.car_vin GROUP BY C.vin ORDER BY numS DESC LIMIT ";
 			System.out.print("\tEnter Number of Cars: ");
 			String input = in.readLine();
 			while (!isInteger(input) || Integer.parseInt(input) < 0) {
-				System.out.print("\tInvalid Number.");
+				System.out.print("\tInvalid Number.\n");
 				System.out.print("\tEnter Enter Number of Cars: ");
 				input = in.readLine();
 			}
 			query += input + ";";
-			
-			
+
 			int rowCount = esql.executeQueryAndPrintResult(query);
 			System.out.println ("total row(s): " + rowCount);
 		}catch(Exception e){
 			System.err.println (e.getMessage());
-		}		
+		}
 	}
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//9
