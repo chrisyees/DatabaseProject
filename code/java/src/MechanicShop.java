@@ -473,8 +473,8 @@ public class MechanicShop{
 			query += "'" + input + "');";
 
 			esql.executeUpdate(query);
-			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin='" + vin + "'");
-			System.out.println ("total row(s): " + rowCount);
+		//	int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin='" + vin + "'");
+		//	System.out.println ("total row(s): " + rowCount);
 
 			String ownsQuery = "INSERT INTO Owns (customer_id, car_vin) VALUES (" + customerID + ", " + vin + ");";
 			esql.executeUpdate(ownsQuery);
