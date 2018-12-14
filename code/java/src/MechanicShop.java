@@ -415,9 +415,10 @@ public class MechanicShop{
 			System.out.print("\tEnter VIN: ");
 			String input = in.readLine();
 			String vin = input;
-			while (input.length() != 16 || esql.executeQuery("SELECT vin FROM Car WHERE vin=" + input + ";") < 1) {
+			while (input.length() != 16 || !(esql.executeQuery("SELECT vin FROM Car WHERE vin='" + input + "';") < 1)) {
 				System.out.print("\tInvalid VIN.\n");
 				System.out.print("\tEnter VIN: ");
+				//System.out.print(esql.executeQuery("SELECT vin FROM Car WHERE vin='" + input + "';" ) + "\n");	
 				input = in.readLine();
 			}
 			query += "'" + input + "', ";
