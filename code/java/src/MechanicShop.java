@@ -356,8 +356,9 @@ public class MechanicShop{
 			query += "'" + input + "');";
 			
 			esql.executeUpdate(query);
-			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Customer WHERE id>499");
-			System.out.println ("total row(s): " + rowCount);
+			System.out.print("Customer Added \n");
+			//int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Customer WHERE id>499");
+			//System.out.println ("total row(s): " + rowCount);
       	}catch(Exception e){
 			System.err.println (e.getMessage());
 		}
@@ -395,8 +396,9 @@ public class MechanicShop{
 			query += input + ");";
 			
 			esql.executeUpdate(query);
-			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Mechanic WHERE experience>5");
-			System.out.println ("total row(s): " + rowCount);
+			System.out.print("Mechanic Added\n");
+			//int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Mechanic WHERE experience>5");
+			//System.out.println ("total row(s): " + rowCount);
       		}catch(Exception e){
 			System.err.println (e.getMessage());
 		}
@@ -476,6 +478,7 @@ public class MechanicShop{
 
 			String ownsQuery = "INSERT INTO Owns (customer_id, car_vin) VALUES (" + customerID + ", " + vin + ");";
 			esql.executeUpdate(ownsQuery);
+			System.out.print("Car Inserted \n");
       	}catch(Exception e){
 			System.err.println (e.getMessage());
       	}
@@ -575,7 +578,7 @@ public class MechanicShop{
 			
 			if(userCars.size() == 0) //user has no cars 
 			{
-				System.out.print("Customer has no cards available. To add one, type \"Add\". Otherwise, input \"Exit\" else to quit: ");
+				System.out.print("Customer has no cars available. To add one, type \"Add\". Otherwise, input \"Exit\" else to quit: ");
 				String choiceToAddCard = in.readLine();
 				while(!choiceToAddCard.equals("Add") && !choiceToAddCard.equals("Exit"))
 				{
@@ -636,7 +639,8 @@ public class MechanicShop{
 
 			//System.out.print(query + "\n");
 
-			esql.executeQuery(query);
+			esql.executeUpdate(query);
+			System.out.print("Initiated Service Request\n");
 			
 	
 			//esql.executeQueryAndPrintResult("SELECT * FROM Service_Request S WHERE S.rid > 30000");
@@ -682,7 +686,7 @@ public class MechanicShop{
 
 			System.out.print("\tEnter Mechanic ID: ");
 			input = in.readLine();
-			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0 || (esql.executeQuery("SELECT * FROM Mechanic M WHERE M.id = " + input ) < 1 )) {
+			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0 || (esql.executeQuery("SELECT * FROM Mechanic M WHERE M.id = " + input + ";" ) < 1 )) {
 				System.out.print("\tInvalid Mechanic ID.\n");
 				System.out.print("\tEnter Mechanic ID: ");
 				input = in.readLine();
@@ -691,11 +695,11 @@ public class MechanicShop{
 
 			System.out.print("\tEnter Date: ");
 			input = in.readLine();
-			query += "'" + input + "',);";
+			query += "'" + input + "', ";
 
 			System.out.print("\tEnter Comment: ");
 			input = in.readLine();
-			query += "'" + input + "',);";
+			query += "'" + input + "', ";
 			
 			System.out.print("\tEnter Bill: ");
 			input = in.readLine();
@@ -707,8 +711,9 @@ public class MechanicShop{
 			query += "'" + input + "');";
 			
 			esql.executeUpdate(query);
-			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Closed_Request WHERE wid>499");
-			System.out.println ("total row(s): " + rowCount);
+			System.out.print("Closed Request Added \n");
+			//int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Closed_Request WHERE wid>499");
+			//System.out.println ("total row(s): " + rowCount);
 
 		}catch(Exception e){
 			System.err.println (e.getMessage());
