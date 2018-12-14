@@ -682,7 +682,7 @@ public class MechanicShop{
 
 			System.out.print("\tEnter Mechanic ID: ");
 			input = in.readLine();
-			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0) {
+			while (input.length() == 0 || !isInteger(input) || Integer.parseInt(input) < 0 || (esql.executeQuery("SELECT * FROM Mechanic M WHERE M.id = " + input ) < 1 )) {
 				System.out.print("\tInvalid Mechanic ID.\n");
 				System.out.print("\tEnter Mechanic ID: ");
 				input = in.readLine();
