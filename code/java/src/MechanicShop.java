@@ -33,7 +33,10 @@ import java.util.ArrayList;
 public class MechanicShop{
 	//reference to physical database connection
 	private Connection _connection = null;
-	static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));	
+	static String addedCustomerFName = "";
+	static String addedCustomerLName = "";
+	static String addedCarVIN = "";
 	
 	public MechanicShop(String dbname, String dbport, String user, String passwd) throws SQLException {
 		System.out.print("Connecting to database...");
@@ -322,7 +325,8 @@ public class MechanicShop{
 				input = in.readLine();
 			}
 			query += "'" + input + "', ";
-			
+			addedCustomerFName = input; //for service request			
+
 			System.out.print("\tEnter Last Name: ");
 			input = in.readLine();
 			while (input.length() == 0 || input.length() > 32 ) {
@@ -330,11 +334,12 @@ public class MechanicShop{
 				System.out.print("\tEnter Last Name: ");
 				input = in.readLine();
 			}
+			addedCustomerLName = input; //for service request
 			query += "'" + input + "', ";
 			
 			System.out.print("\tEnter Phone Number (###)###-####: ");
 			input = in.readLine();
-			while (input.length() == 0 || input.length() > 13 || !input.matches("\\(\\d{3})\\d{3}-\\d{4}")) {
+			while (input.length() == 0 || input.length() > 13){// || !input.matches("\\(\\d{3})\\d{3}-\\d{4}")) {
 				System.out.print("\tInvalid Phone Number.\n");
 				System.out.print("\tEnter Phone Number: ");
 				input = in.readLine();
@@ -359,6 +364,42 @@ public class MechanicShop{
 	}
 	
 	public static void AddMechanic(MechanicShop esql){//2
+		try{
+			String query = "INSERT INTO Mechanic (fname, lname, experience) VALUES (";
+			//System.out.print("\tYou are now adding a Mechanic.\n\tEnter \"Quit\" to exit.\n");	
+			System.out.print("\tEnter First Name: ");
+			String input = in.readLine();
+			while (input.length() == 0 || input.length() > 32 ) {
+				System.out.print("\tName Invalid.\n");
+				System.out.print("\tEnter First Name: ");
+				input = in.readLine();
+			}
+			query += "'" + input + "', ";
+			
+			System.out.print("\tEnter Last Name: ");
+			input = in.readLine();
+			while (input.length() == 0 || input.length() > 32 ) {
+				System.out.print("\tName Invalid.\n");
+				System.out.print("\tEnter Last Name: ");
+				input = in.readLine();
+			}
+			query += "'" + input + "', ";
+			
+			System.out.print("\tEnter Experience: ");
+			input = in.readLine();
+			while (!isInteger(input) || Integer.parseInt(input) < 0) {
+				System.out.print("\tInvalid Experience.\n");
+				System.out.print("\tEnter Experience: ");
+				input = in.readLine();
+			}
+			query += input + ");";
+			
+			esql.executeUpdate(query);
+			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Mechanic WHERE experience>5");
+			System.out.println ("total row(s): " + rowCount);
+      		}catch(Exception e){
+			System.err.println (e.getMessage());
+		}
 		
 	}
 	
@@ -372,16 +413,18 @@ public class MechanicShop{
 			String query = "INSERT INTO Car (vin, make, model, year) VALUES (";
 			
 			System.out.print("\tEnter VIN: ");
-			String vin = in.readLine();
+			String input = in.readLine();
+			String vin = input;
 			while (input.length() != 16 || esql.executeQuery("SELECT vin FROM Car WHERE vin=" + input + ";") < 1) {
 				System.out.print("\tInvalid VIN.\n");
 				System.out.print("\tEnter VIN: ");
 				input = in.readLine();
 			}
 			query += "'" + input + "', ";
-			
+			addedCarVIN = input;
+
 			System.out.print("\tEnter Make: ");
-			String input = in.readLine();
+			input = in.readLine();
 			while (input.length() == 0 || input.length() > 32 ) {
 				System.out.print("\tInvalid Make.\n");
 				System.out.print("\tEnter Make: ");
@@ -416,7 +459,166 @@ public class MechanicShop{
 	}
 	
 	public static void InsertServiceRequest(MechanicShop esql){//4
+		try{
+			String custID = "";
+			String query = "INSERT INTO Service_Request (customer_id, car_vin, date, odometer, complain) VALUES (";
+			Boolean addedCustomer = false;
+			System.out.print("\tEnter Last Name of Customer or Input \"Add\" to add a new Customer: ");
+			String input = in.readLine();
+			if(input.equals("Add")){
+				AddCustomer(esql);
+				addedCustomer = true;
+			}
+			if(!addedCustomer)
+			{
+			while (input.length() == 0 || input.length() > 32 ) {
+				System.out.print("\tName Invalid.\n");
+				System.out.print("\tEnter Last Name: ");
+				input = in.readLine();
+			}
+			String lastNameQuery = "SELECT C.fname, C.lname FROM Customer C WHERE c.lname = '" + input + "'";
+			List<List<String>> names = esql.executeQueryAndReturnResult(lastNameQuery);
+			/*
+			for(int i = 0; i < names.size(); i++)
+			{
+				for(int j = 0; j < names.get(i).size(); j++)
+				{
+					System.out.print(names.get(i).get(j));
+					//System.out.print("hello");
+				}
+			}
+			*/
+			String customerid = "";
+			if(names.size() == 0)
+			{
+				System.out.print("\tName does not exist.. Returning to Main Menu\n");
+				return;
+			}
+			else if(names.size() == 1)
+			{
+				String idQuery = "SELECT C.id FROM Customer C WHERE C.lname = '" + names.get(0).get(1) + "';";
+				List<List<String>> ids = esql.executeQueryAndReturnResult(idQuery);
+				//System.out.println(ids.get(0).get(0));
+				//System.out.println("ID printed\n");
+				query += ids.get(0).get(0) + ", ";
+				custID = ids.get(0).get(0);
+			}
+			else if(names.size() > 0)
+			{
+				esql.executeQueryAndPrintResult(lastNameQuery);		
+				System.out.print("\tThere are multiple people with the same last name.\n");		
+				System.out.print("\tEnter the first name of the customer: ");
+				String nameInput = in.readLine();
+				Boolean nameCheck = false;
+				for(int i = 0; i < names.size(); i++)
+				{
+					System.out.print("'" + nameInput + "' '" + names.get(i).get(0)+ "'\n");
+					if(nameInput.equals(names.get(i).get(0).replaceAll("\\s+","")))
+					{
+						nameCheck = true;
+					}
+				}
+				if(!nameCheck)
+				{
+					System.out.print("\tName doesnot exist.. Returning to Main Menu\n");
+					return;
+				}
+				String fnameQuery = "SELECT C.id FROM Customer C WHERE C.fname = '" + nameInput + "' AND C.lname = '" + input + "';";
+				List<List<String>> bothNamesList = esql.executeQueryAndReturnResult(fnameQuery);
+				query += bothNamesList.get(0).get(0) + ", ";
+				custID = bothNamesList.get(0).get(0);
+			}
+			else
+			{
+				System.out.print("\tError in finding Customer\n");
+				return;
+			}
+			}
+			else
+			{
+				System.out.print("Newly Added Customer: " + addedCustomerFName + " " + addedCustomerLName + "\n");
+				String addedCustomerQuery = "SELECT C.id FROM Customer C WHERE C.fname = '" + addedCustomerFName + "' AND C.lname = '" + addedCustomerLName + "';"; 
+				List<List<String>> addedCustomerID = esql.executeQueryAndReturnResult(addedCustomerQuery);
+				query += addedCustomerID.get(0).get(0) + ", ";
+				custID = addedCustomerID.get(0).get(0);
+			}
+			//System.out.print(query + "\n");
+			//START CAR QUERY
+			String carQuery = "SELECT R.vin, R.make, R.model, R.year FROM Car R, Customer C, Owns O WHERE C.id = O.customer_id AND R.vin = O.car_vin AND C.id = " + custID + ";";
+			List<List<String>> userCars = esql.executeQueryAndReturnResult(carQuery);
+			//Boolean addedCarCheck = false;
+			if(userCars.size() == 0) 
+			{
+				System.out.print("Customer has no cards available. To add one, type \"Add\". Otherwise, input \"Exit\" else to quit");
+				String choiceToAddCard = in.readLine();
+				while(!choiceToAddCard.equals("Add") || !choiceToAddCard.equals("Exit"))
+				{
+					choiceToAddCard = in.readLine();
+				}
+				if(choiceToAddCard.equals("Add"))
+				{
+					AddCar(esql);
+					//addedCarCheck = true;
+					query += "'" + addedCarVIN + "', ";
+				}
+				else{
+					System.out.print("Returning to Main Menu.. \n");
+				}
+			}
+			else if(userCars.size() == 1)	
+			{
+				query += "'" + userCars.get(0).get(0) + "', ";
+			}
+			else if(userCars.size() > 1)
+			{
+				esql.executeQueryAndPrintResult(carQuery);
+				System.out.print("Input the VIN of the desired car: ");
+				String desiredCarInput = in.readLine();
+				Boolean desiredCarCheck = false;
+				for(int i = 0; i < userCars.size(); i++)
+				{
+					if(desiredCarInput.equals(userCars.get(i).get(0).replaceAll("\\s+","")))
+					{
+						desiredCarCheck = true;
+					}
+				}
+				if(!desiredCarCheck)
+				{
+					System.out.print("Car does not exist .. Returning to the Main Menu\n");
+					return;
+				}
+				query += "'" + desiredCarInput + "', ";
+			}
+			else{
+				System.out.print("\tError in finding Car\n");
+				return;
+			}	
 
+			System.out.print("Success\n");
+			
+			System.out.print("\tEnter Date: ");
+			input = in.readLine();
+			query += "'" + input + "', ";
+
+			System.out.print("\tEnter Odometer Value: ");
+			input = in.readLine();
+			query +=  input + ", ";
+
+			System.out.print("\tEnter Complaint: ");
+			input = in.readLine();
+			query += "'" + input + "');";
+
+			//System.out.print(query + "\n");
+
+			esql.executeQuery(query);
+			
+	
+			//esql.executeQueryAndPrintResult("SELECT * FROM Service_Request");
+			
+		}catch(Exception e){
+			System.err.println (e.getMessage());
+		}
+	
 	}
 	
 	public static void CloseServiceRequest(MechanicShop esql) throws Exception{//5
@@ -488,7 +690,14 @@ public class MechanicShop{
 	}
 	
 	public static void ListCustomersWithBillLessThan100(MechanicShop esql){//6
-
+		try{
+			//String test = "SELECT C.fname, C.lname, CR.bill FROM Customer C, Service_Request SR, Closed_Request CR WHERE C.id = SR.customer_ID AND SR.rid = CR.rid ORDER BY C.fname;";
+			String query = "SELECT C.fname, C.lname, CR.bill, CR.date, CR.comment FROM Closed_Request CR, Service_Request SR, Customer C WHERE C.id = SR.customer_id AND SR.rid = CR.rid AND CR.bill < 100";
+			int rowCount = esql.executeQueryAndPrintResult(query);
+			System.out.println ("total row(s): " + rowCount);
+		}catch(Exception e){
+			System.err.println (e.getMessage());
+		} 
 	}
 	
 	public static void ListCustomersWithMoreThan20Cars(MechanicShop esql){//7
@@ -502,7 +711,13 @@ public class MechanicShop{
 	}
 	
 	public static void ListCarsBefore1995With50000Milles(MechanicShop esql){//8
-		
+		try{
+			String query = "SELECT C.make, C.model, C.year, SR.odometer FROM Car C, Service_Request SR WHERE C.vin = SR.car_vin AND C.year < 1995 AND SR.odometer < 50000;";
+			int rowCount = esql.executeQueryAndPrintResult(query);
+			System.out.println("total row(s); " + rowCount);
+		}catch(Exception e){
+			System.err.println(e.getMessage());
+		}
 	}
 	
 	public static void ListKCarsWithTheMostServices(MechanicShop esql){//9
@@ -525,7 +740,13 @@ public class MechanicShop{
 	}
 	
 	public static void ListCustomersInDescendingOrderOfTheirTotalBill(MechanicShop esql){//9
-		//
+		try{
+			String query = "SELECT C.fname, C.lname, SUM(CR.bill) AS b FROM Customer C, Service_Request SR, Closed_Request CR WHERE C.id = SR.customer_id AND CR.rid = SR.rid GROUP BY C.fname, C.lname  ORDER BY b DESC;";
+			int rowCount = esql.executeQueryAndPrintResult(query);
+			System.out.println("total row(s): " + rowCount);
+		}catch(Exception e){
+			System.err.println(e.getMessage());
+		}
 		
 	}
 	
