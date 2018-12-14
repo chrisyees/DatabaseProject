@@ -549,9 +549,9 @@ public class MechanicShop{
 			//Boolean addedCarCheck = false;
 			if(userCars.size() == 0) 
 			{
-				System.out.print("Customer has no cards available. To add one, type \"Add\". Otherwise, input \"Exit\" else to quit");
+				System.out.print("Customer has no cards available. To add one, type \"Add\". Otherwise, input \"Exit\" else to quit: ");
 				String choiceToAddCard = in.readLine();
-				while(!choiceToAddCard.equals("Add") || !choiceToAddCard.equals("Exit"))
+				while(!choiceToAddCard.equals("Add") && !choiceToAddCard.equals("Exit"))
 				{
 					choiceToAddCard = in.readLine();
 				}
