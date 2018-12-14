@@ -412,6 +412,25 @@ public class MechanicShop{
 		try{
 			String query = "INSERT INTO Car (vin, make, model, year) VALUES (";
 			
+			String customerID = "";
+			String firstName = "";
+			String lastName = "";
+			System.out.print("\tEnter Customer first name: ");
+			firstName = in.readLine();
+		
+			System.out.print("\tEnter Customer last name: ");
+			lastName = in.readLine();
+			
+			String carOwnQuery = "SELECT C.id FROM Customer C WHERE C.fname = '" + firstName + "' AND C.lname = '" + lastName + "';";
+
+			List<List<String>> test = esql.executeQueryAndReturnResult(carOwnQuery);
+			if(test.size() == 0)
+			{
+				System.out.print("\tCustomer Does Not Exist\n");
+				return;
+			}
+			customerID = test.get(0).get(0);
+
 			System.out.print("\tEnter VIN: ");
 			String input = in.readLine();
 			String vin = input;
@@ -454,6 +473,9 @@ public class MechanicShop{
 			esql.executeUpdate(query);
 			int rowCount = esql.executeQueryAndPrintResult("SELECT * FROM Car WHERE vin='" + vin + "'");
 			System.out.println ("total row(s): " + rowCount);
+
+			String ownsQuery = "INSERT INTO Owns (customer_id, car_vin) VALUES (" + customerID + ", " + vin + ");";
+			esql.executeUpdate(ownsQuery);
       	}catch(Exception e){
 			System.err.println (e.getMessage());
       	}
@@ -490,12 +512,12 @@ public class MechanicShop{
 			}
 			*/
 			String customerid = "";
-			if(names.size() == 0)
+			if(names.size() == 0) // no names match
 			{
 				System.out.print("\tName does not exist.. Returning to Main Menu\n");
 				return;
 			}
-			else if(names.size() == 1)
+			else if(names.size() == 1) //exactly one name matches
 			{
 				String idQuery = "SELECT C.id FROM Customer C WHERE C.lname = '" + names.get(0).get(1) + "';";
 				List<List<String>> ids = esql.executeQueryAndReturnResult(idQuery);
@@ -503,8 +525,9 @@ public class MechanicShop{
 				//System.out.println("ID printed\n");
 				query += ids.get(0).get(0) + ", ";
 				custID = ids.get(0).get(0);
+				System.out.print("Customer Mr/Mrs. " + names.get(0).get(0).replaceAll("\\s+","") + " is Selected.\n"); 
 			}
-			else if(names.size() > 0)
+			else if(names.size() > 0) //many name match
 			{
 				esql.executeQueryAndPrintResult(lastNameQuery);		
 				System.out.print("\tThere are multiple people with the same last name.\n");		
@@ -543,12 +566,14 @@ public class MechanicShop{
 				query += addedCustomerID.get(0).get(0) + ", ";
 				custID = addedCustomerID.get(0).get(0);
 			}
+
 			//System.out.print(query + "\n");
+
 			//START CAR QUERY
 			String carQuery = "SELECT R.vin, R.make, R.model, R.year FROM Car R, Customer C, Owns O WHERE C.id = O.customer_id AND R.vin = O.car_vin AND C.id = " + custID + ";";
 			List<List<String>> userCars = esql.executeQueryAndReturnResult(carQuery);
-			//Boolean addedCarCheck = false;
-			if(userCars.size() == 0) 
+			
+			if(userCars.size() == 0) //user has no cars 
 			{
 				System.out.print("Customer has no cards available. To add one, type \"Add\". Otherwise, input \"Exit\" else to quit: ");
 				String choiceToAddCard = in.readLine();
@@ -559,18 +584,18 @@ public class MechanicShop{
 				if(choiceToAddCard.equals("Add"))
 				{
 					AddCar(esql);
-					//addedCarCheck = true;
 					query += "'" + addedCarVIN + "', ";
 				}
 				else{
 					System.out.print("Returning to Main Menu.. \n");
 				}
 			}
-			else if(userCars.size() == 1)	
+			else if(userCars.size() == 1) //user has one car	
 			{
 				query += "'" + userCars.get(0).get(0) + "', ";
+				System.out.print("User only has one car. Car selected VIN: " + userCars.get(0).get(0) + ".\n");
 			}
-			else if(userCars.size() > 1)
+			else if(userCars.size() > 1) //user has multiple cars
 			{
 				esql.executeQueryAndPrintResult(carQuery);
 				System.out.print("Input the VIN of the desired car: ");
@@ -595,7 +620,7 @@ public class MechanicShop{
 				return;
 			}	
 
-			System.out.print("Success\n");
+			//System.out.print("Success\n");
 			
 			System.out.print("\tEnter Date: ");
 			input = in.readLine();
@@ -614,7 +639,7 @@ public class MechanicShop{
 			esql.executeQuery(query);
 			
 	
-			//esql.executeQueryAndPrintResult("SELECT * FROM Service_Request");
+			//esql.executeQueryAndPrintResult("SELECT * FROM Service_Request S WHERE S.rid > 30000");
 			
 		}catch(Exception e){
 			System.err.println (e.getMessage());
