@@ -631,6 +631,11 @@ public class MechanicShop{
 
 			System.out.print("\tEnter Odometer Value: ");
 			input = in.readLine();
+			while (!isInteger(input) || Integer.parseInt(input) < 0) {
+				System.out.print("\tInvalid Odometer Value.\n");
+				System.out.print("\tEnter Odometer Value: ");
+				input = in.readLine();
+			}
 			query +=  input + ", ";
 
 			System.out.print("\tEnter Complaint: ");
